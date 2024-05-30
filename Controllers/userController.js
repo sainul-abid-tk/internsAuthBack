@@ -15,8 +15,9 @@ exports.userSignup=async(req,res)=>{
             );
           };
           if(validateEmail(email)){
+           
             const newUser= users({
-                username,email,password:encryptPassword
+                username,email,password:encryptPassword,profilePic:""
             })
            await newUser.save()
            res.status(200).json(newUser)
@@ -43,4 +44,34 @@ exports.userLogin=async(req,res)=>{
    }catch(err){
     res.status(401).json(err)
    }
+}
+
+exports.googleLogin=async(req,res)=>{
+  const {email,username,profilePic}=req.body
+  try{
+    const sentUserData=(existingUser)=>{
+      const token=jwt.sign({userId:existingUser._id},process.env.JWT_SECRET_KEY)
+      res.status(200).json({existingUser,token})
+    }
+    const existingUser=await users.findOne({email})
+    if(existingUser){
+      sentUserData(existingUser)
+    }else{
+      let newUser= users({
+        username,email,password:"",profilePic
+    })
+   await newUser.save()
+   sentUserData(newUser)
+    }
+  }catch(err){
+    res.status(401).json(err)
+  }
+}
+
+exports.dummyAPI=async(req,res)=>{
+  try{
+    res.status(200).json({userId:req.payload,message:'User accessed!!'})
+  }catch(err){
+    res.status(401).json(err)
+  }
 }

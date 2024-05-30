@@ -7,12 +7,20 @@ const userSchema=new mongoose.Schema({
     },
     email:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     password:{
+        type:String
+    },
+    profilePic:{
+        type:String
+    },
+    role:{
         type:String,
-        required:true
+        default:'user'
     }
+
 },{timestamps:true})
 
 const users=mongoose.model('users',userSchema)
